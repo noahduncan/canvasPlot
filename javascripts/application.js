@@ -6,7 +6,7 @@
 		  return Math.min.apply(null, this)
 		}
 		
-		function drawBoard(null)
+		function drawBoard()
 		{
 			var c=document.getElementById("myCanvas");
 			var cxt = c.getContext("2d");
@@ -15,8 +15,8 @@
 			cxt.save();
 			
 			
-			p_width = c.width-20;
-			p_height = c.height-30;
+			p_width = c.width-50;
+			p_height = c.height-50;
 			inset_width = 3;
 			
 			// draw plot area and inset
@@ -35,10 +35,13 @@
 			cxt.fill();
 		}
 		
+	function plotData(){
+			var c=document.getElementById("myCanvas");
+			var cxt = c.getContext("2d");
 		cxt.fillStyle="Black"
-		cxt.fillText("Time", 240, 330);
-		cxt.fillText("23:58:00", 30, 311);
-		cxt.fillText("24:59:59", 440, 311);
+		cxt.fillText("Time", 210, 310);
+		cxt.fillText("23:58:00", 0, 291);
+		cxt.fillText("24:59:59", 410, 291);
 
 		y_coords = new Array(-1806.92,-1827.01,-1896.62,-1878.67,-1843.98,-1835.31,-1843.42,-1874.23,-1847.22,
 												 -1855.47,-1867.72,-1879.07,-1832.14,-1814.57,-1842.32,-1889.89,-1898.01,-1847.13,
@@ -69,7 +72,7 @@
 		var y_coord_min = y_coords.min();
 		
 		cxt.save();
-		cxt.translate(33,23);
+		cxt.translate(5,3);
 		cxt.strokeStyle="#336633";
 		cxt.beginPath();
 		for(i=0;i<x_coords.length;i++)
@@ -87,4 +90,5 @@
 		cxt.restore();
 		cxt.rotate(-Math.PI/2);
 		cxt.fillStyle="#336633";
-		cxt.fillText("uGals", -50, 29);
+		cxt.fillText("uGals", -30, -1);
+	}
