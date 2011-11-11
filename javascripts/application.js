@@ -7,8 +7,10 @@ Array.prototype.min = function() {
 }
 
 var Plot = function(c_id, ctxt){
+	var self = this;
 	var c=document.getElementById(c_id);
 	var ctx=c.getContext(ctxt);
+	var plotInfo = {};
 	var data = {
 							x: new Array(86280,86281,86282,86283,86284,86285,86286,86287,86288,86289,86290,86291,86292,86293,86294,
 												 86295,86296,86297,86298,86299,86300,86301,86302,86303,86304,86305,86306,86307,86308,86309,
@@ -32,6 +34,8 @@ var Plot = function(c_id, ctxt){
 												 -1817.14,-1827.00,-1853.79,-1873.57,-1896.60,-1878.83,-1797.19,-1799.25,-1881.14,
 												 -1921.42,-1878.71,-1832.98,-1789.95,-1831.76,-1918.94,-1892.85,-1815.42,-1836.75,
 												 -1884.32,-1846.47,-1829.37),
+							s_time_min: "23:58:00",
+							s_time_max: "23:59:59",
 						  length: function(){
 						 		if(this.x.length == this.y.length)
 						 			return this.x.length
@@ -40,25 +44,27 @@ var Plot = function(c_id, ctxt){
 						 	}
 						}
 
-	this.drawBoard = function(style){
-		switch(style)
+	this.drawBoard = function(options){
+		options = options || {};
+		preset = options.preset || 'inset';
+		margin = options.margin || {t:20,r:20,b:30,l:20};
+		colors = options.colors || {bg:"#CCCCCC",plotArea:"#EEEEEE",axes:"#444444"};
+		switch(preset)
 		{
 			case "inset":
-				ctx.fillStyle="#CCCCCC";
+				ctx.fillStyle=colors.bg;
 				ctx.fillRect(0,0,c.width,c.height);
 				ctx.save();
 				
-				
-				margin = {t:20,r:20,b:30,l:20}
 				p_width = c.width-margin.r-margin.l;
 				p_height = c.height-margin.t-margin.b;
-				inset_width = 3;
+				inset_width = 3;  // TODO Figure out how to set this argument
 				
 				// draw plot area and inset
 				ctx.translate(margin.l,margin.t);
-				ctx.fillStyle="#EEEEEE";
+				ctx.fillStyle=colors.plotArea;
 				ctx.fillRect(0,0,p_width,p_height);
-				ctx.fillStyle="#444444";
+				ctx.fillStyle=colors.axes;
 				ctx.beginPath();
 				ctx.moveTo(0,p_height);
 				ctx.lineTo(0,0);
@@ -75,22 +81,27 @@ var Plot = function(c_id, ctxt){
 				throw new Error("drawBoard(): Uknown drawBoard style");
 				break;
 		}
-		return {translate:{x:margin.l+inset_width, y:margin.t+inset_width}, dims:{w:p_width-inset_width, h:p_height-inset_width}};
-	};
-	
-	this.plotData = function(dat){
+		plotInfo={translate:{x:margin.l+inset_width, y:margin.t+inset_width}, dims:{w:p_width-inset_width, h:p_height-inset_width}};
+		// TODO Add gridlines??
+	}
+		
+	this.plotData = function(options){
+		// TODO create workable interface between plotData and drawBoard (dims, insets, etc.)
+		options = options || {};
+		lineStyle = options.lineStyle || "#336633";
+		
 		ctx.fillStyle="Black"
 		ctx.fillText("Time", 210, 310);
-		ctx.fillText("23:58:00", 0, 291);
-		ctx.fillText("24:59:59", 410, 291);
-
+		ctx.fillText(data.s_time_min, 0, 291);
+		ctx.fillText(data.s_time_max, 415, 291);
+	
 		x_min = data.x.min();
 		x_max = data.x.max();
 		y_min = data.y.min();
 		y_max = data.y.max();
 		ctx.save();
 		ctx.translate(5,3);
-		ctx.strokeStyle="#336633";
+		ctx.strokeStyle=lineStyle;
 		ctx.beginPath();
 		for(i=0;i<data.length();i++)
 		{
@@ -105,9 +116,29 @@ var Plot = function(c_id, ctxt){
 		ctx.stroke();
 		
 		ctx.restore();
+		ctx.save();
 		ctx.rotate(-Math.PI/2);
-		ctx.fillStyle="#336633";
+		ctx.fillStyle=lineStyle;
 		ctx.fillText("uGals", -30, -1);
+		ctx.restore();
 	}
-
+	
+	this.clearCanvas = function(){
+		ctx.restore();
+		ctx.clearRect(0,0,c.width,c.height);
+	}
+	
+	this.retrieveData = function(url){
+		var plotAjax = new Ajax.Request(url,{
+			onFailure: function(response){
+				throw new Error("retrieveData failed: " + response.status);
+			},
+			onSuccess: function(response){
+				eval(response.responseText);
+				self.clearCanvas();
+				self.drawBoard();
+				self.plotData();
+			}
+		});
+	}
 }
