@@ -20,16 +20,16 @@ var Plot = function(c_id, ctxt){
 	var ctx=c.getContext(ctxt);
 	var plotInfo = {};
 	var data = {
-							x: false,
-						  y: false,
-							t: false,
-						  length: function(){
-						 		if(this.x.length == this.y.length)
-						 			return this.x.length
-						 		else
-						 			throw new Error("x and y arrays are not equal length");
-						 	}
-						}
+		x: false,
+		y: false,
+		t: false,
+		length: function(){
+		if(this.x.length == this.y.length)
+			return this.x.length
+		else
+			throw new Error("x and y arrays are not equal length");
+ 		}
+	}
 
 	this.drawBoard = function(options){
 		options = options || {};
