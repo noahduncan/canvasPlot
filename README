@@ -1,0 +1,7 @@
+CanvasPlot is a way to create real time graphics from a database using the HTML5
+canvas element to plot the data.  
+
+There is much work to be done, the project is really in its infancy.
+
+BUGS:
+- seems to have a memory leak
